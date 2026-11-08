@@ -1,3 +1,0 @@
-launch:
-  # pretty-bytes is a library: nothing merged here needs deploying.
-  deploy: []
