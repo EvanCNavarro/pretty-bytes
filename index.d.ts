@@ -200,6 +200,26 @@ export type Options = {
 	```
 	*/
 	readonly longForm?: boolean;
+
+	/**
+	Force a specific unit instead of automatically selecting one based on the number's magnitude.
+
+	Must be one of the units belonging to the unit system selected by `bits` and `binary`. Throws a `TypeError` if the unit does not belong to that system.
+
+	@default undefined
+
+	@example
+	```
+	import prettyBytes from 'pretty-bytes';
+
+	prettyBytes(1337, {unit: 'kB'});
+	//=> '1.34 kB'
+
+	prettyBytes(1_200_000, {unit: 'MB'});
+	//=> '1.2 MB'
+	```
+	*/
+	readonly unit?: string;
 };
 
 /**

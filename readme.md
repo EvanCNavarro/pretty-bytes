@@ -260,6 +260,25 @@ prettyBytes(1, {longForm: true});
 //=> '1 byte'
 ```
 
+##### unit
+
+Type: `string`\
+Default: `undefined`
+
+Force a specific unit instead of automatically selecting one based on the number's magnitude.
+
+Must be one of the units belonging to the unit system selected by `bits` and `binary`. Throws a `TypeError` if the unit does not belong to that system.
+
+```js
+import prettyBytes from 'pretty-bytes';
+
+prettyBytes(1337, {unit: 'kB'});
+//=> '1.34 kB'
+
+prettyBytes(1_200_000, {unit: 'MB'});
+//=> '1.2 MB'
+```
+
 ## FAQ
 
 ### Why kB and not KB?

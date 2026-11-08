@@ -9,3 +9,4 @@ expectType<string>(prettyBytes(1337, {bits: true}));
 expectType<string>(prettyBytes(1337, {binary: true}));
 expectType<string>(prettyBytes(1337, {space: true}));
 expectType<string>(prettyBytes(1337, {longForm: true}));
+expectType<string>(prettyBytes(1337, {unit: 'kB'}));
