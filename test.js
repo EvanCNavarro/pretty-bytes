@@ -1147,3 +1147,25 @@ test('the options shape the output as documented', t => {
 		t.is(prettyBytes(value, {signed: true}), prefix + prettyBytes(Math.abs(value)));
 	}
 });
+
+test('longForm option', t => {
+	t.is(prettyBytes(1_500_000, {longForm: true}), '1.5 megabytes');
+	t.is(prettyBytes(1, {longForm: true}), '1 byte');
+	t.is(prettyBytes(2, {longForm: true}), '2 bytes');
+	t.is(prettyBytes(0, {longForm: true}), '0 bytes');
+	t.is(prettyBytes(1000, {longForm: true}), '1 kilobyte');
+	t.is(prettyBytes(1_048_576, {longForm: true, binary: true}), '1 mebibyte');
+	t.is(prettyBytes(1024, {longForm: true, binary: true}), '1 kibibyte');
+	t.is(prettyBytes(1000, {longForm: true, bits: true}), '1 kilobit');
+	t.is(prettyBytes(1024, {longForm: true, bits: true, binary: true}), '1 kibibit');
+	t.is(prettyBytes(1, {longForm: true, bits: true}), '1 bit');
+	t.is(prettyBytes(2, {longForm: true, bits: true}), '2 bits');
+
+	// Combines with signed, locale and fraction digit options without changing their behaviour.
+	t.is(prettyBytes(42, {signed: true, longForm: true}), '+42 bytes');
+	t.is(prettyBytes(1337, {locale: 'de', longForm: true}), '1,34 kilobytes');
+	t.is(prettyBytes(1900, {longForm: true, minimumFractionDigits: 3}), '1.900 kilobytes');
+
+	// Output without the option is unaffected.
+	t.is(prettyBytes(1337), '1.34 kB');
+});

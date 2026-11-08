@@ -240,6 +240,26 @@ prettyBytes(100_000, {fixedWidth: 10});
 //=> ['    1 kB', '   10 kB', '  100 kB']
 ```
 
+
+##### longForm
+
+Type: `boolean`\
+Default: `false`
+
+Spell out the unit name instead of using its abbreviation, for example `megabyte` instead of `MB`. Pluralizes the word for anything but exactly `1`.
+
+Combines with `binary` and `bits` to select the matching unit family (for example `kibibyte` or `kilobit`), and with every other option.
+
+```js
+import prettyBytes from 'pretty-bytes';
+
+prettyBytes(1500000, {longForm: true});
+//=> '1.5 megabytes'
+
+prettyBytes(1, {longForm: true});
+//=> '1 byte'
+```
+
 ## FAQ
 
 ### Why kB and not KB?

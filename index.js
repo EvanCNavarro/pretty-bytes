@@ -49,6 +49,57 @@ const BIBIT_UNITS = [
 // Indexed by `bits` and then `binary`, so the four unit systems are picked in one step.
 const UNIT_SETS = [BYTE_UNITS, BIBYTE_UNITS, BIT_UNITS, BIBIT_UNITS];
 
+const LONG_BYTE_UNITS = [
+	['byte', 'bytes'],
+	['kilobyte', 'kilobytes'],
+	['megabyte', 'megabytes'],
+	['gigabyte', 'gigabytes'],
+	['terabyte', 'terabytes'],
+	['petabyte', 'petabytes'],
+	['exabyte', 'exabytes'],
+	['zettabyte', 'zettabytes'],
+	['yottabyte', 'yottabytes'],
+];
+
+const LONG_BIBYTE_UNITS = [
+	['byte', 'bytes'],
+	['kibibyte', 'kibibytes'],
+	['mebibyte', 'mebibytes'],
+	['gibibyte', 'gibibytes'],
+	['tebibyte', 'tebibytes'],
+	['pebibyte', 'pebibytes'],
+	['exbibyte', 'exbibytes'],
+	['zebibyte', 'zebibytes'],
+	['yobibyte', 'yobibytes'],
+];
+
+const LONG_BIT_UNITS = [
+	['bit', 'bits'],
+	['kilobit', 'kilobits'],
+	['megabit', 'megabits'],
+	['gigabit', 'gigabits'],
+	['terabit', 'terabits'],
+	['petabit', 'petabits'],
+	['exabit', 'exabits'],
+	['zettabit', 'zettabits'],
+	['yottabit', 'yottabits'],
+];
+
+const LONG_BIBIT_UNITS = [
+	['bit', 'bits'],
+	['kibibit', 'kibibits'],
+	['mebibit', 'mebibits'],
+	['gibibit', 'gibibits'],
+	['tebibit', 'tebibits'],
+	['pebibit', 'pebibits'],
+	['exbibit', 'exbibits'],
+	['zebibit', 'zebibits'],
+	['yobibit', 'yobibits'],
+];
+
+// Indexed by `bits` and then `binary`, same as `UNIT_SETS`.
+const LONG_UNIT_SETS = [LONG_BYTE_UNITS, LONG_BIBYTE_UNITS, LONG_BIT_UNITS, LONG_BIBIT_UNITS];
+
 /*
 `Number#toString` switches to exponential notation outside the range [1e-6, 1e21) and `Intl.NumberFormat` drops every fraction digit past the 100 it accepts.
 Byte counts read as plain decimal numbers, so both losses are undone here. Expects a finite, non-negative number.
@@ -232,6 +283,7 @@ export default function prettyBytes(number, options) {
 
 	// Indexed by `bits` then `binary`, so the four combinations line up in one table.
 	const UNITS = UNIT_SETS[(options.bits ? 2 : 0) + (options.binary ? 1 : 0)];
+	const LONG_UNITS = LONG_UNIT_SETS[(options.bits ? 2 : 0) + (options.binary ? 1 : 0)];
 
 	const separator = options.space ? (options.nonBreakingSpace ? '\u00A0' : ' ') : '';
 
@@ -257,6 +309,7 @@ export default function prettyBytes(number, options) {
 	const scaled = divide(number, base, exponent);
 
 	let numberString;
+	let isSingular;
 	if (Number.isFinite(scaled)) {
 		number = scaled;
 
@@ -276,12 +329,15 @@ export default function prettyBytes(number, options) {
 			}
 		}
 
+		isSingular = number === 1;
 		numberString = toLocaleString(number, options.locale, localeOptions);
 	} else {
 		// The scaled value is past what a `number` can hold, so the exact quotient is written out instead.
 		numberString = toUnrepresentableString(number, base, exponent, localeOptions);
+		isSingular = numberString === '1';
 	}
 
-	const result = prefix + numberString + separator + UNITS[exponent];
+	const unit = options.longForm ? LONG_UNITS[exponent][isSingular ? 0 : 1] : UNITS[exponent];
+	const result = prefix + numberString + separator + unit;
 	return result.padStart(options.fixedWidth ?? 0);
 }
