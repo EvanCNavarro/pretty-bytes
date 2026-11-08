@@ -693,6 +693,27 @@ test('fixedWidth option', t => {
 	t.is(prettyBytes(1337, {fixedWidth: 8, nonBreakingSpace: true}), ' 1.34\u00A0kB');
 });
 
+test('unit option', t => {
+	t.is(prettyBytes(1_200_000, {unit: 'MB'}), '1.2 MB');
+	t.is(prettyBytes(900_000, {unit: 'MB'}), '0.9 MB');
+	t.is(prettyBytes(1_200_000, {unit: 'MiB', binary: true}), '1.14 MiB');
+	t.is(prettyBytes(1_200_000, {unit: 'Mbit', bits: true}), '1.2 Mbit');
+
+	t.throws(() => {
+		prettyBytes(1_200_000, {unit: 'MiB'});
+	}, {instanceOf: TypeError});
+
+	t.throws(() => {
+		prettyBytes(1_200_000, {unit: 'MB', binary: true});
+	}, {instanceOf: TypeError});
+
+	t.throws(() => {
+		prettyBytes(1_200_000, {unit: 'Mbit'});
+	}, {instanceOf: TypeError});
+
+	t.is(prettyBytes(1337), '1.34 kB');
+});
+
 test('documented examples are accurate', t => {
 	for (const fileName of ['readme.md', 'index.d.ts']) {
 		const {blocks, examples} = documentedExamples(new URL(fileName, import.meta.url));

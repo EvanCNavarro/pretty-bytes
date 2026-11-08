@@ -285,6 +285,15 @@ export default function prettyBytes(number, options) {
 	const UNITS = UNIT_SETS[(options.bits ? 2 : 0) + (options.binary ? 1 : 0)];
 	const LONG_UNITS = LONG_UNIT_SETS[(options.bits ? 2 : 0) + (options.binary ? 1 : 0)];
 
+	let unitIndex;
+	if (options.unit !== undefined) {
+		unitIndex = UNITS.indexOf(options.unit);
+
+		if (unitIndex === -1) {
+			throw new TypeError(`Expected unit to be one of ${UNITS.join(', ')}, got: ${options.unit}`);
+		}
+	}
+
 	const separator = options.space ? (options.nonBreakingSpace ? '\u00A0' : ' ') : '';
 
 	// Normalize `-0` to `0` so it never formats as `-0`.
@@ -301,7 +310,9 @@ export default function prettyBytes(number, options) {
 	const base = options.binary ? 1024 : 1000;
 
 	let exponent = 0;
-	if (number >= 1) {
+	if (unitIndex !== undefined) {
+		exponent = unitIndex;
+	} else if (number >= 1) {
 		exponent = Math.min(Math.floor(options.binary ? log(number) / Math.log(base) : log10(number) / 3), UNITS.length - 1);
 	}
 
@@ -313,8 +324,8 @@ export default function prettyBytes(number, options) {
 	if (Number.isFinite(scaled)) {
 		number = scaled;
 
-		// A value that sits just below a unit boundary, like `999999999999999` bytes, has a `log10` that rounds up to the boundary itself, so the exponent has to be corrected back.
-		if (number < 1 && exponent > 0) {
+		// A value that sits just below a unit boundary, like `999999999999999` bytes, has a `log10` that rounds up to the boundary itself, so the exponent has to be corrected back. Skipped when the unit was forced, since that unit must not change.
+		if (unitIndex === undefined && number < 1 && exponent > 0) {
 			number *= base;
 			exponent -= 1;
 		}
@@ -323,7 +334,7 @@ export default function prettyBytes(number, options) {
 			const minimumPrecision = Math.max(3, Math.floor(number).toString().length);
 			number = Number(number.toPrecision(minimumPrecision));
 
-			if (number >= base && exponent < UNITS.length - 1) {
+			if (unitIndex === undefined && number >= base && exponent < UNITS.length - 1) {
 				number /= base;
 				exponent += 1;
 			}
